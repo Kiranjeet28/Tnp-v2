@@ -1,10 +1,23 @@
 generator client {
   provider = "prisma-client-js"
-   output   = "./src/generated/prisma"
 }
-
 
 datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+// Posts for announcements, news, updates
+model Post {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  content     String     // Rich text content
+  excerpt     String?    // Short description
+  tags        String[]   // Array of tags
+  department  String?   
+  LastSubmittedAt DateTime?  // For deadlines
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  CGPA       Float?    // Minimum CGPA requirement
+  @@map("posts")
 }
