@@ -27,8 +27,8 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             posts,
-            tags: ["All", ...tags],
-            departments: ["All", ...departments, "All Engineering"],
+            tags: [, ...tags],
+            departments: [, ...departments],
         })
     } catch (error) {
         console.error("Error fetching posts:", error)
