@@ -36,11 +36,11 @@ export function PostCreationForm() {
         id: "",
         title: "",
         content: "",
-        excerpt: null,
+        excerpt: "",
         tags: [],
-        department: null,
-        CGPA: null,
-        LastSubmittedAt: null,
+        department: "",
+        CGPA: 0,
+        LastSubmittedAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
     })
@@ -89,45 +89,51 @@ export function PostCreationForm() {
     };
 
     const handleSubmit = async () => {
-        setIsSaving(true)
+        setIsSaving(true);
+        console.log("PostData before submit:", postData);
 
         try {
-            // Get the latest content from the editor before submitting
             const latestContent = editorRef.current?.getContent() || postData.content;
 
-            const response = await fetch("/api/posts/create", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                ...postData,
+            const submitData: any = {
+                title: postData.title,
                 content: latestContent,
-            }),
+                tags: postData.tags,
+                excerpt: postData.excerpt?.trim() || null,
+                department: postData.department ?? null,
+                CGPA: postData.CGPA ?? null,
+                LastSubmittedAt: postData.LastSubmittedAt
+                    ? postData.LastSubmittedAt.toISOString()
+                    : undefined,
+            };
+
+            console.log("Submitting:", submitData);
+
+            const response = await fetch("/api/posts/create", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(submitData),
             });
 
             if (response.ok) {
-            const result = await response.json();
-            console.log("Post saved successfully:", result);
-            // Clear localStorage after successful save
-            localStorage.removeItem('editorContent');
-            // Show success toast using sonner
+                const result = await response.json();
+                console.log("Post saved successfully:", result);
+                localStorage.removeItem("editorContent");
                 toast.success("Post saved successfully!");
-            route.push('/');
+                route.push("/");
             } else {
-            const error = await response.json();
-            console.error("Failed to save post:", error.error);
-            // Show error toast using sonner
+                const error = await response.json();
+                console.error("Failed to save post:", error.error);
                 toast.error("Failed to save post: " + (error.error || "Unknown error"));
             }
         } catch (error) {
             console.error("Error saving post:", error);
-            // Show network error toast using sonner
-                toast.error("Network error while saving post.");
+            toast.error("Network error while saving post.");
         } finally {
             setIsSaving(false);
         }
-    }
+    };
+
 
     const departments = [
         "Computer Science",
@@ -183,8 +189,8 @@ export function PostCreationForm() {
                             <Textarea
                                 id="excerpt"
                                 placeholder="Brief description of your post..."
-                                value={postData.excerpt ?? ""}
-                                onChange={(e) => setPostData({ ...postData, excerpt: e.target.value })}
+                                value={postData.excerpt || ""}
+                                onChange={(e) => setPostData({ ...postData, excerpt: e.target.value || null })}
                                 rows={3}
                                 className="border-2"
                             />
@@ -209,8 +215,8 @@ export function PostCreationForm() {
                             <LabelInputContainer>
                                 <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Department</Label>
                                 <Select
-                                    value={postData.department ?? ""}
-                                    onValueChange={(value) => setPostData({ ...postData, department: value })}
+                                    value={postData.department || ""}
+                                    onValueChange={(value) => setPostData({ ...postData, department: value || null })}
                                 >
                                     <SelectTrigger className="border-2 border-blue-100 focus:border-blue-500">
                                         <SelectValue placeholder="Select department" />
@@ -238,13 +244,13 @@ export function PostCreationForm() {
                                     min="0"
                                     max="10"
                                     placeholder="e.g., 8.5"
-                                    value={postData.CGPA || ""}
+                                    value={postData.CGPA !== null && postData.CGPA !== undefined ? postData.CGPA : ""}
                                     onChange={(e) => {
-                                        const value = e.target.value ? Number.parseFloat(e.target.value) : null
+                                        const value = e.target.value;
                                         setPostData({
                                             ...postData,
-                                            CGPA: value !== null && value > 10 ? 10 : value,
-                                        })
+                                            CGPA: value === "" ? null : Math.min(10, Math.max(0, Number.parseFloat(value))),
+                                        });
                                     }}
                                     className="border-2"
                                 />
@@ -272,8 +278,8 @@ export function PostCreationForm() {
                                 <PopoverContent className="w-auto p-0 bg-white border-2 border-blue-200 shadow-xl">
                                     <Calendar
                                         mode="single"
-                                        selected={postData.LastSubmittedAt || undefined}
-                                        onSelect={(date) => setPostData({ ...postData, LastSubmittedAt: date || null })}
+                                        selected={postData.LastSubmittedAt ? postData.LastSubmittedAt : undefined}
+                                        onSelect={(date) => setPostData({ ...postData, LastSubmittedAt: date ? date : null })}
                                         autoFocus
                                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                                         className="rounded-md border-0"
