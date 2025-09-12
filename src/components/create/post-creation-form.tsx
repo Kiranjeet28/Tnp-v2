@@ -1,0 +1,319 @@
+"use client"
+
+import { useEffect, useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Calendar } from "@/components/ui/calendar"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { TagInput } from "./tag-input"
+import { CalendarIcon, Eye, Save, Send } from "lucide-react"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import type { Post } from "@prisma/client"
+import { LabelInputContainer } from "../reusable/LabelInput"
+import { BackgroundGradient } from "../ui/background-gradient"
+import dynamic from "next/dynamic"
+import { PostCard } from "../main/postCard"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+
+const RichTextEditor = dynamic(() => import('./rich-text-editor'), {
+    ssr: false
+});
+
+type RichTextEditorHandle = {
+    getContent: () => string;
+    setContent: (content: string) => void;
+};
+
+export function PostCreationForm() {
+    const route = useRouter();
+    const [postData, setPostData] = useState<Post>({
+        id: "",
+        title: "",
+        content: "",
+        excerpt: null,
+        tags: [],
+        department: null,
+        CGPA: null,
+        LastSubmittedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+    })
+    const editorRef = useRef<RichTextEditorHandle>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false)
+    const [isSaving, setIsSaving] = useState(false)
+    const [previewData, setPreviewData] = useState<Post>(postData)
+
+    // Load content from localStorage on component mount
+    useEffect(() => {
+        const savedContent = localStorage.getItem('editorContent');
+        if (savedContent) {
+            setPostData(prev => ({ ...prev, content: savedContent }));
+        }
+    }, []);
+
+    // Auto-save to localStorage whenever content changes
+    useEffect(() => {
+        if (postData.content) {
+            localStorage.setItem('editorContent', postData.content);
+        }
+    }, [postData.content]);
+
+    // Handle content changes from the rich text editor
+    const handleContentChange = (content: string) => {
+        setPostData((prev) => ({ ...prev, content }));
+    };
+
+    // Manual clear function
+    const handleClear = () => {
+        setPostData(prev => ({ ...prev, content: '' }));
+        localStorage.removeItem('editorContent');
+        if (editorRef.current) {
+            editorRef.current.setContent('');
+        }
+    };
+
+    // Handle preview - get latest content from editor
+    const handlePreviewOpen = () => {
+        const latestContent = editorRef.current?.getContent() || postData.content;
+        setPreviewData({
+            ...postData,
+            content: latestContent
+        });
+        setIsPreviewOpen(true);
+    };
+
+    const handleSubmit = async () => {
+        setIsSaving(true)
+
+        try {
+            // Get the latest content from the editor before submitting
+            const latestContent = editorRef.current?.getContent() || postData.content;
+
+            const response = await fetch("/api/posts/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                ...postData,
+                content: latestContent,
+            }),
+            });
+
+            if (response.ok) {
+            const result = await response.json();
+            console.log("Post saved successfully:", result);
+            // Clear localStorage after successful save
+            localStorage.removeItem('editorContent');
+            // Show success toast using sonner
+                toast.success("Post saved successfully!");
+            route.push('/');
+            } else {
+            const error = await response.json();
+            console.error("Failed to save post:", error.error);
+            // Show error toast using sonner
+                toast.error("Failed to save post: " + (error.error || "Unknown error"));
+            }
+        } catch (error) {
+            console.error("Error saving post:", error);
+            // Show network error toast using sonner
+                toast.error("Network error while saving post.");
+        } finally {
+            setIsSaving(false);
+        }
+    }
+
+    const departments = [
+        "Computer Science",
+        "Electrical Engineering",
+        "Mechanical Engineering",
+        "Civil Engineering",
+        "Chemical Engineering",
+        "Electronics Engineering",
+        "Information Technology",
+    ]
+
+    return (
+        <div className="max-w-4xl mx-auto">
+            <BackgroundGradient className="rounded-3xl">
+                <div className="bg-white rounded-3xl p-8 space-y-6">
+                    {/* Title */}
+                    <div className="space-y-2">
+                        <LabelInputContainer>
+                            <Label htmlFor="title" className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                Title *
+                            </Label>
+                            <Input
+                                id="title"
+                                placeholder="Enter post title..."
+                                value={postData.title}
+                                onChange={(e) => setPostData({ ...postData, title: e.target.value })}
+                                className="text-lg font-semibold border-2"
+                            />
+                        </LabelInputContainer>
+                    </div>
+
+                    {/* Content Editor */}
+                    <div className="space-y-2">
+                        <LabelInputContainer>
+                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Content *</Label>
+                            <div>
+                                <RichTextEditor
+                                    ref={editorRef}
+                                    onContentChange={handleContentChange}
+                                    initialContent={postData.content}
+                                    debounceMs={500} // Wait 500ms after user stops typing
+                                />
+                            </div>
+                        </LabelInputContainer>
+                    </div>
+
+                    {/* Excerpt */}
+                    <div className="space-y-2">
+                        <LabelInputContainer>
+                            <Label htmlFor="excerpt" className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                Excerpt
+                            </Label>
+                            <Textarea
+                                id="excerpt"
+                                placeholder="Brief description of your post..."
+                                value={postData.excerpt ?? ""}
+                                onChange={(e) => setPostData({ ...postData, excerpt: e.target.value })}
+                                rows={3}
+                                className="border-2"
+                            />
+                        </LabelInputContainer>
+                    </div>
+
+                    {/* Tags */}
+                    <div className="space-y-2">
+                        <LabelInputContainer>
+                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Tags</Label>
+                            <TagInput
+                                tags={postData.tags}
+                                onChange={(tags) => setPostData({ ...postData, tags })}
+                                placeholder="Add tags..."
+                            />
+                        </LabelInputContainer>
+                    </div>
+
+                    {/* Department and CGPA Row */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                            <LabelInputContainer>
+                                <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Department</Label>
+                                <Select
+                                    value={postData.department ?? ""}
+                                    onValueChange={(value) => setPostData({ ...postData, department: value })}
+                                >
+                                    <SelectTrigger className="border-2 border-blue-100 focus:border-blue-500">
+                                        <SelectValue placeholder="Select department" />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white border-blue-200">
+                                        {departments.map((dept) => (
+                                            <SelectItem key={dept} value={dept} className="hover:bg-blue-50">
+                                                {dept}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </LabelInputContainer>
+                        </div>
+
+                        <div className="space-y-2">
+                            <LabelInputContainer>
+                                <Label htmlFor="cgpa" className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                    Minimum CGPA Requirement
+                                </Label>
+                                <Input
+                                    id="cgpa"
+                                    type="number"
+                                    step="0.1"
+                                    min="0"
+                                    max="10"
+                                    placeholder="e.g., 8.5"
+                                    value={postData.CGPA || ""}
+                                    onChange={(e) => {
+                                        const value = e.target.value ? Number.parseFloat(e.target.value) : null
+                                        setPostData({
+                                            ...postData,
+                                            CGPA: value !== null && value > 10 ? 10 : value,
+                                        })
+                                    }}
+                                    className="border-2"
+                                />
+                            </LabelInputContainer>
+                        </div>
+                    </div>
+
+                    {/* Deadline */}
+                    <div className="space-y-2">
+                        <LabelInputContainer>
+                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Submission Deadline</Label>
+                            <Popover>
+                                <PopoverTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className={cn(
+                                            "w-full justify-start text-left font-normal border-2 border-blue-100 hover:bg-blue-50 hover:border-blue-300 bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent",
+                                            !postData.LastSubmittedAt && "text-slate-500",
+                                        )}
+                                    >
+                                        <CalendarIcon className="mr-2 h-4 w-4 text-blue-600" />
+                                        {postData.LastSubmittedAt ? format(postData.LastSubmittedAt, "PPP") : <span>Pick a date</span>}
+                                    </Button>
+                                </PopoverTrigger>
+                                <PopoverContent className="w-auto p-0 bg-white border-2 border-blue-200 shadow-xl">
+                                    <Calendar
+                                        mode="single"
+                                        selected={postData.LastSubmittedAt || undefined}
+                                        onSelect={(date) => setPostData({ ...postData, LastSubmittedAt: date || null })}
+                                        autoFocus
+                                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+                                        className="rounded-md border-0"
+                                    />
+                                </PopoverContent>
+                            </Popover>
+                        </LabelInputContainer>
+                    </div>
+                </div>
+            </BackgroundGradient>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-between mt-8">
+                <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                    <DialogTrigger asChild>
+                        <Button
+                            onClick={handlePreviewOpen}
+                            variant="outline"
+                            className="flex items-center gap-2 bg-white border-2 border-blue-600 text-blue-700 hover:bg-blue-50 hover:border-blue-700 shadow-lg font-semibold px-6 py-3 rounded-xl transition-all duration-300"
+                        >
+                            <Eye className="h-5 w-5" />
+                            Preview Post
+                        </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-4xl overflow-y-auto bg-white border-2 border-blue-400 rounded-2xl">
+                        <DialogHeader>
+                            <DialogTitle className="text-slate-800 text-xl font-bold">Post Preview</DialogTitle>
+                        </DialogHeader>
+                        <PostCard post={previewData} />
+                    </DialogContent>
+                </Dialog>
+
+                <Button
+                    onClick={() => handleSubmit()}
+                    disabled={isSaving || !postData.title.trim()}
+                    className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-800 text-white hover:from-blue-800 hover:to-blue-900 shadow-lg font-semibold px-6 py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
+                >
+                    <Send className="h-5 w-5" />
+                    {isSaving ? "Publishing..." : "Publish Post"}
+                </Button>
+            </div>
+        </div>
+    )
+}
