@@ -3,8 +3,6 @@
 import type { Post } from "@prisma/client"
 import { useEffect, useState } from "react"
 import PostsList from "./postList"
-import { Footer } from "./Footer"
-import { NavbarDemo } from "../reusable/navbar"
 import { Statistics } from "./Analysis"
 import SmartFilter from "./smartFilter"
 
@@ -105,7 +103,6 @@ export default function HomePage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-            <NavbarDemo />
             <Statistics activeOpportunities={activeOpportunities} expiredOpportunities={expiredOpportunities} />
 
             <div className="container mx-auto px-4 py-12">
@@ -127,7 +124,6 @@ export default function HomePage() {
                 <PostsList posts={filteredPosts} loading={loading} activeOpportunities={activeOpportunities} />
             </div>
 
-            <Footer />
         </div>
     )
 }

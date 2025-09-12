@@ -141,9 +141,9 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                     </div>
 
                     {/* Enhanced Filter Grid */}
-                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                         {/* Department Filter */}
-                        <div className="space-y-3">
+                        <LabelInputContainer>
                             <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
                                 <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
                                 DEPARTMENT
@@ -164,10 +164,10 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                                 <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-500 pointer-events-none transition-transform group-hover:scale-110" />
                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-blue-800/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                             </div>
-                        </div>
+                        </LabelInputContainer>
 
                         {/* Job Type Filter */}
-                        <div className="space-y-3">
+                        <LabelInputContainer>
                             <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
                                 <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
                                 JOB TYPE
@@ -188,10 +188,10 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                                 <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-500 pointer-events-none transition-transform group-hover:scale-110" />
                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-blue-800/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                             </div>
-                        </div>
+                        </LabelInputContainer>
 
                         {/* CGPA Filter */}
-                        <div className="space-y-3">
+                        <LabelInputContainer>
                             <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
                                 <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
                                 MIN CGPA
@@ -209,19 +209,23 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-blue-800/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                             </div>
-                        </div>
+                        </LabelInputContainer>
 
                         {/* Status Toggle */}
-                        <div className="space-y-3">
+                        <LabelInputContainer className="justify-end">
+                            <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
+                                <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
+                                STATUS
+                            </Label>
                             <div className="relative group">
                                 <button
                                     onClick={handleExpiredToggle}
                                     className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left font-medium shadow-md hover:shadow-lg ${showExpiredOnly
-                                            ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 text-red-900"
-                                            : "bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-900"
+                                        ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 text-red-900"
+                                        : "bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-900"
                                         }`}
                                 >
-                                    <div className="flex items-center justify-between">
+                                    <div className="flex items-center justify-between cursor-pointer">
                                         <div className="flex items-center space-x-3">
                                             {showExpiredOnly ? (
                                                 <AlertCircle className="w-5 h-5 text-red-600" />
@@ -244,7 +248,7 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                                     </div>
                                 </button>
                             </div>
-                        </div>
+                        </LabelInputContainer>
                     </div>
 
                     {/* Active Filters Display */}

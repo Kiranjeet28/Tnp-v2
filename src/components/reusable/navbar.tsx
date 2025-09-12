@@ -11,21 +11,28 @@ import {
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
- 
+import { useRouter } from "next/navigation";
+import { Button } from "../ui/button";
+
 export function NavbarDemo() {
   const navItems = [
     {
       name: "Home",
-      link: "https://gndec.ac.in/",
+      link: "/",
+    },
+    {
+      name: "Create",
+      link: "/create",
     },
     {
       name: "Contact",
       link: "https://www.tnpgndec.com/",
     },
   ];
- 
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
- 
+  const router = useRouter();
+
   return (
     <div className="relative w-full">
       <Navbar className="">
@@ -34,10 +41,15 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton variant="primary" className="bg-[#1e3c98] hover:bg-blue-700 text-white">Create</NavbarButton>
+            <NavbarButton
+              onClick={() => router.push('/create')}
+              className="px-8 py-2 rounded-md bg-blue-900 text-white font-bold transition duration-200 hover:bg-white hover:text-blue-400 border-2 border-transparent hover:border-blue-500 cursor-pointer"
+            >
+              Create
+            </NavbarButton>
           </div>
         </NavBody>
- 
+
         {/* Mobile Navigation */}
         <MobileNav>
           <MobileNavHeader>
@@ -47,7 +59,7 @@ export function NavbarDemo() {
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             />
           </MobileNavHeader>
- 
+
           <MobileNavMenu
             isOpen={isMobileMenuOpen}
             onClose={() => setIsMobileMenuOpen(false)}
@@ -57,25 +69,22 @@ export function NavbarDemo() {
                 key={`mobile-link-${idx}`}
                 href={item.link}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="relative text-neutral-600 dark:text-neutral-300"
+                className="relative text-neutral-600 dark:text-neutral-300 cursor-pointer"
               >
                 <span className="block">{item.name}</span>
               </a>
             ))}
             <div className="flex w-full flex-col gap-4">
-             
-              <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
-                variant="primary"
-                className="w-full bg-[#1e3c98] hover:bg-blue-700 text-white"
+              <button
+                onClick={() => router.push('/create')}
+                className="px-8 py-2 rounded-md bg-blue-900 text-white font-bold transition duration-200 hover:bg-white hover:text-blue-400 border-2 border-transparent hover:border-blue-500 cursor-pointer"
               >
                 Create
-              </NavbarButton>
+              </button>
             </div>
           </MobileNavMenu>
         </MobileNav>
       </Navbar>
- 
     </div>
   );
 }
