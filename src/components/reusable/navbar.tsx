@@ -43,7 +43,7 @@ export function NavbarDemo() {
           <div className="flex items-center gap-4">
             <NavbarButton
               onClick={() => router.push('/create')}
-              className="px-8 py-2 rounded-md bg-blue-900 text-white font-bold transition duration-200 hover:bg-white hover:text-blue-400 border-2 border-transparent hover:border-blue-500 cursor-pointer"
+              className="px-8 py-2 rounded-md bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white font-bold transition duration-200 hover:from-gray-200 hover:to-white hover:via-gray-200 hover:text-blue-500 border-2 border-transparent hover:border-blue-500 cursor-pointer"
             >
               Create
             </NavbarButton>

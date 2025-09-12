@@ -6,6 +6,7 @@ import { Search, X, Sparkles, Clock, ChevronDown, AlertCircle, Filter, Zap } fro
 import { cn } from "@/lib/utils"
 import { Label } from "../ui/label"
 import { Input } from "../ui/input"
+import { LabelInputContainer } from "../reusable/LabelInput"
 
 interface SmartFilterProps {
     searchTerm: string
@@ -330,16 +331,3 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
 
 export default SmartFilter
 
-const LabelInputContainer = ({
-    children,
-    className,
-}: {
-    children: React.ReactNode;
-    className?: string;
-}) => {
-    return (
-        <div className={cn("flex w-full flex-col space-y-2", className)}>
-            {children}
-        </div>
-    );
-};
