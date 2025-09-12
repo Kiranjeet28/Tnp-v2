@@ -111,7 +111,7 @@ export const NavBody = ({ children, className, visible }: NavBodyProps) => {
   );
 };
 
-const HOVER_BG = "bg-[#1e3c98]";
+const HOVER_BG = "bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900";
 
 export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
   const [hovered, setHovered] = useState<number | null>(null);
@@ -146,7 +146,7 @@ export const NavItems = ({ items, className, onItemClick }: NavItemsProps) => {
               )}
             />
           )}
-          <span className="relative z-20">{item.name}</span>
+          <span className="relative z-20 text-blue-800 hover:text-white">{item.name}</span>
         </a>
       ))}
     </motion.div>
