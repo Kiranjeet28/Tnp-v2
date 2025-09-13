@@ -10,8 +10,16 @@ const postSchema = z.object({
     excerpt: z.string().optional().nullable(),
     tags: z.array(z.string()).optional().default([]),
     department: z.string().optional().nullable(),
-    CGPA: z.number().optional().nullable(),
-    LastSubmittedAt: z.any().optional().nullable(),
+    CGPA: z
+        .number()
+        .nullable()
+        .optional()
+        .transform((val) => (val === 0 ? null : val)),
+    LastSubmittedAt: z
+        .string()
+        .nullable()
+        .optional()
+        .transform((val) => (val ? new Date(val) : null)),
     isDraft: z.boolean().optional().default(false),
 })
 

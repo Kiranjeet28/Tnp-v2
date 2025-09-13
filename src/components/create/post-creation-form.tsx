@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { TagInput } from "./tag-input"
-import { CalendarIcon, Eye, Save, Send } from "lucide-react"
+import { CalendarIcon, Eye, Send } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
@@ -21,79 +21,89 @@ import { PostCard } from "../main/postCard"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 
-const RichTextEditor = dynamic(() => import('./rich-text-editor'), {
-    ssr: false
-});
+const RichTextEditor = dynamic(() => import("./rich-text-editor"), {
+    ssr: false,
+})
 
 type RichTextEditorHandle = {
-    getContent: () => string;
-    setContent: (content: string) => void;
-};
+    getContent: () => string
+    setContent: (content: string) => void
+}
 
-export function PostCreationForm() {
-    const route = useRouter();
-    const [postData, setPostData] = useState<Post>({
-        id: "",
-        title: "",
-        content: "",
-        excerpt: "",
-        tags: [],
-        department: "",
-        CGPA: 0,
-        LastSubmittedAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
+interface PostCreationFormProps {
+    initialPost?: Post | null
+}
+
+export function PostCreationForm({ initialPost }: PostCreationFormProps) {
+    const route = useRouter()
+    const [postData, setPostData] = useState<Post>(() => {
+        if (initialPost) {
+            return {
+                ...initialPost,
+                LastSubmittedAt: initialPost.LastSubmittedAt ? new Date(initialPost.LastSubmittedAt) : null,
+            }
+        }
+        return {
+            id: "",
+            title: "",
+            content: "",
+            excerpt: "",
+            tags: [],
+            department: "",
+            CGPA: null,
+            LastSubmittedAt: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        }
     })
-    const editorRef = useRef<RichTextEditorHandle>(null);
+    const editorRef = useRef<RichTextEditorHandle>(null)
     const [isPreviewOpen, setIsPreviewOpen] = useState(false)
     const [isSaving, setIsSaving] = useState(false)
     const [previewData, setPreviewData] = useState<Post>(postData)
+    const isEditMode = !!initialPost
 
-    // Load content from localStorage on component mount
     useEffect(() => {
-        const savedContent = localStorage.getItem('editorContent');
-        if (savedContent) {
-            setPostData(prev => ({ ...prev, content: savedContent }));
+        if (!isEditMode) {
+            const savedContent = localStorage.getItem("editorContent")
+            if (savedContent) {
+                setPostData((prev) => ({ ...prev, content: savedContent }))
+            }
         }
-    }, []);
+    }, [isEditMode])
 
-    // Auto-save to localStorage whenever content changes
     useEffect(() => {
-        if (postData.content) {
-            localStorage.setItem('editorContent', postData.content);
+        if (!isEditMode && postData.content) {
+            localStorage.setItem("editorContent", postData.content)
         }
-    }, [postData.content]);
+    }, [postData.content, isEditMode])
 
-    // Handle content changes from the rich text editor
     const handleContentChange = (content: string) => {
-        setPostData((prev) => ({ ...prev, content }));
-    };
+        setPostData((prev) => ({ ...prev, content }))
+    }
 
-    // Manual clear function
     const handleClear = () => {
-        setPostData(prev => ({ ...prev, content: '' }));
-        localStorage.removeItem('editorContent');
+        setPostData((prev) => ({ ...prev, content: "" }))
+        localStorage.removeItem("editorContent")
         if (editorRef.current) {
-            editorRef.current.setContent('');
+            editorRef.current.setContent("")
         }
-    };
+    }
 
-    // Handle preview - get latest content from editor
     const handlePreviewOpen = () => {
-        const latestContent = editorRef.current?.getContent() || postData.content;
+        const latestContent = editorRef.current?.getContent() || postData.content
         setPreviewData({
             ...postData,
-            content: latestContent
-        });
-        setIsPreviewOpen(true);
-    };
+            content: latestContent,
+        })
+        setIsPreviewOpen(true)
+    }
 
     const handleSubmit = async () => {
-        setIsSaving(true);
-        console.log("PostData before submit:", postData);
+        setIsSaving(true)
+        console.log("PostData before submit:", postData)
 
         try {
-            const latestContent = editorRef.current?.getContent() || postData.content;
+            const latestContent = editorRef.current?.getContent() || postData.content
 
             const submitData: any = {
                 title: postData.title,
@@ -101,39 +111,42 @@ export function PostCreationForm() {
                 tags: postData.tags,
                 excerpt: postData.excerpt?.trim() || null,
                 department: postData.department ?? null,
-                CGPA: postData.CGPA ?? null,
-                LastSubmittedAt: postData.LastSubmittedAt
-                    ? postData.LastSubmittedAt.toISOString()
-                    : undefined,
-            };
+                CGPA: postData.CGPA === null || postData.CGPA === undefined || postData.CGPA === 0 ? null : postData.CGPA,
+                LastSubmittedAt: postData.LastSubmittedAt ? postData.LastSubmittedAt.toISOString() : null,
+            }
 
-            console.log("Submitting:", submitData);
+            if (isEditMode) {
+                submitData.id = postData.id
+            }
+
+            console.log("Submitting:", submitData)
 
             const response = await fetch("/api/posts/create", {
-                method: "POST",
+                method: isEditMode ? "PUT" : "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(submitData),
-            });
+            })
 
             if (response.ok) {
-                const result = await response.json();
-                console.log("Post saved successfully:", result);
-                localStorage.removeItem("editorContent");
-                toast.success("Post saved successfully!");
-                route.push("/");
+                const result = await response.json()
+                console.log("Post saved successfully:", result)
+                if (!isEditMode) {
+                    localStorage.removeItem("editorContent")
+                }
+                toast.success(isEditMode ? "Post updated successfully!" : "Post saved successfully!")
+                route.push(isEditMode ? `/post/${postData.id}` : "/")
             } else {
-                const error = await response.json();
-                console.error("Failed to save post:", error.error);
-                toast.error("Failed to save post: " + (error.error || "Unknown error"));
+                const error = await response.json()
+                console.error("Failed to save post:", error.error)
+                toast.error("Failed to save post: " + (error.error || "Unknown error"))
             }
         } catch (error) {
-            console.error("Error saving post:", error);
-            toast.error("Network error while saving post.");
+            console.error("Error saving post:", error)
+            toast.error("Network error while saving post.")
         } finally {
-            setIsSaving(false);
+            setIsSaving(false)
         }
-    };
-
+    }
 
     const departments = [
         "Computer Science",
@@ -152,7 +165,10 @@ export function PostCreationForm() {
                     {/* Title */}
                     <div className="space-y-2">
                         <LabelInputContainer>
-                            <Label htmlFor="title" className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                            <Label
+                                htmlFor="title"
+                                className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent"
+                            >
                                 Title *
                             </Label>
                             <Input
@@ -168,7 +184,9 @@ export function PostCreationForm() {
                     {/* Content Editor */}
                     <div className="space-y-2">
                         <LabelInputContainer>
-                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Content *</Label>
+                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                Content *
+                            </Label>
                             <div>
                                 <RichTextEditor
                                     ref={editorRef}
@@ -183,7 +201,10 @@ export function PostCreationForm() {
                     {/* Excerpt */}
                     <div className="space-y-2">
                         <LabelInputContainer>
-                            <Label htmlFor="excerpt" className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                            <Label
+                                htmlFor="excerpt"
+                                className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent"
+                            >
                                 Excerpt
                             </Label>
                             <Textarea
@@ -200,7 +221,9 @@ export function PostCreationForm() {
                     {/* Tags */}
                     <div className="space-y-2">
                         <LabelInputContainer>
-                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Tags</Label>
+                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                Tags
+                            </Label>
                             <TagInput
                                 tags={postData.tags}
                                 onChange={(tags) => setPostData({ ...postData, tags })}
@@ -213,7 +236,9 @@ export function PostCreationForm() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <LabelInputContainer>
-                                <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Department</Label>
+                                <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                    Department
+                                </Label>
                                 <Select
                                     value={postData.department || ""}
                                     onValueChange={(value) => setPostData({ ...postData, department: value || null })}
@@ -234,7 +259,10 @@ export function PostCreationForm() {
 
                         <div className="space-y-2">
                             <LabelInputContainer>
-                                <Label htmlFor="cgpa" className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                <Label
+                                    htmlFor="cgpa"
+                                    className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent"
+                                >
                                     Minimum CGPA Requirement
                                 </Label>
                                 <Input
@@ -244,13 +272,15 @@ export function PostCreationForm() {
                                     min="0"
                                     max="10"
                                     placeholder="e.g., 8.5"
-                                    value={postData.CGPA !== null && postData.CGPA !== undefined ? postData.CGPA : ""}
+                                    value={
+                                        postData.CGPA !== null && postData.CGPA !== undefined && postData.CGPA !== 0 ? postData.CGPA : ""
+                                    }
                                     onChange={(e) => {
-                                        const value = e.target.value;
+                                        const value = e.target.value
                                         setPostData({
                                             ...postData,
                                             CGPA: value === "" ? null : Math.min(10, Math.max(0, Number.parseFloat(value))),
-                                        });
+                                        })
                                     }}
                                     className="border-2"
                                 />
@@ -261,7 +291,9 @@ export function PostCreationForm() {
                     {/* Deadline */}
                     <div className="space-y-2">
                         <LabelInputContainer>
-                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">Submission Deadline</Label>
+                            <Label className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent">
+                                Submission Deadline
+                            </Label>
                             <Popover>
                                 <PopoverTrigger asChild>
                                     <Button
@@ -275,14 +307,13 @@ export function PostCreationForm() {
                                         {postData.LastSubmittedAt ? format(postData.LastSubmittedAt, "PPP") : <span>Pick a date</span>}
                                     </Button>
                                 </PopoverTrigger>
-                                <PopoverContent className="w-auto p-0 bg-white border-2 border-blue-200 shadow-xl">
+                                <PopoverContent className="w-auto p-0 bg-white border-2 border-blue-200 shadow-xl rounded-md ">
                                     <Calendar
                                         mode="single"
                                         selected={postData.LastSubmittedAt ? postData.LastSubmittedAt : undefined}
-                                        onSelect={(date) => setPostData({ ...postData, LastSubmittedAt: date ? date : null })}
+                                        onSelect={(date) => setPostData({ ...postData, LastSubmittedAt: date || null })}
                                         autoFocus
                                         disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                                        className="rounded-md border-0"
                                     />
                                 </PopoverContent>
                             </Popover>
@@ -317,7 +348,7 @@ export function PostCreationForm() {
                     className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-800 text-white hover:from-blue-800 hover:to-blue-900 shadow-lg font-semibold px-6 py-3 rounded-xl transition-all duration-300 disabled:opacity-50"
                 >
                     <Send className="h-5 w-5" />
-                    {isSaving ? "Publishing..." : "Publish Post"}
+                    {isSaving ? (isEditMode ? "Updating..." : "Publishing...") : isEditMode ? "Update Post" : "Publish Post"}
                 </Button>
             </div>
         </div>
