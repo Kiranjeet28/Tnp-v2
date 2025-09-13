@@ -89,7 +89,7 @@ export function PostDetailsView({ post }: PostDetailsViewProps) {
         <div className="space-y-6">
             {/* Header with Back Button and Actions */}
             <div className="flex items-center justify-between">
-                <Button variant="outline" onClick={() => router.back()} className="flex items-center gap-2  bg-gradient-to-r hover:from-blue-900 hover:via-blue-800 hover:to-blue-900 hover:text-white font-bold transition duration-200 from-gray-200 to-white via-gray-200 text-blue-500 border-2  border-blue-500 cursor-pointer">
+                <Button variant="outline" onClick={() => router.push('/')} className="flex items-center gap-2  bg-gradient-to-r hover:from-blue-900 hover:via-blue-800 hover:to-blue-900 hover:text-white font-bold transition duration-200 from-gray-200 to-white via-gray-200 text-blue-500 border-2  border-blue-500 cursor-pointer">
                     <ArrowLeft className="w-4 h-4" />
                     Back
                 </Button>
