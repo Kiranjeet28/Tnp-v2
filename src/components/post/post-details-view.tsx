@@ -247,9 +247,7 @@ export function PostDetailsView({ post }: PostDetailsViewProps) {
                             </div>
                         )}
 
-                        <div className="flex-shrink-0">
-                            <Clock className="w-6 h-6 text-slate-400" />
-                        </div>
+                    
 
                     </div>
                 </div>

@@ -26,7 +26,7 @@ export function NavbarDemo() {
     },
     {
       name: "Contact",
-      link: "https://www.tnpgndec.com/",
+      link: "https://portfolokiranjeet28.vercel.app/",
     },
   ];
 

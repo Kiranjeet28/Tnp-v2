@@ -1,10 +1,18 @@
 import { Post } from '@prisma/client';
 import { Star, Building2, GraduationCap, Clock, Calendar, ChevronRight, Bookmark, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 import React, { useState } from 'react';
 
-export const PostCard = ({ post }: { post: Post }) => {
+export const PostCard = ({
+    post,
+    isHome = false,
+    externalLink
+}: {
+    post: Post;
+    isHome?: boolean;
+    externalLink?: string;
+}) => {
     const [showMoreTags, setShowMoreTags] = useState<boolean>(false);
 
     const isPostNotDue = (post: Post) => {
@@ -31,15 +39,23 @@ export const PostCard = ({ post }: { post: Post }) => {
     const stillOpen = isPostNotDue(post);
     const daysRemaining = post.LastSubmittedAt ? getDaysRemaining(post.LastSubmittedAt) : null;
     const isExpired = post.LastSubmittedAt;
-
+    const route = useRouter();
+    const handleCardClick = () => {
+        if (isHome) {
+            route.push(`/posts/${post.id}`);
+        } else if (externalLink) {
+            window.open(externalLink, '_blank');
+        }
+    };
     return (
-       <Link href={`/post/${post.id}`} passHref>
+        
         <div className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-3 ${!isExpired
             ? 'border border-red-400 hover:border-red-500'
             : stillOpen
                 ? 'border-2 border-emerald-200 hover:border-emerald-300 bg-gradient-to-br from-emerald-50/30 via-white to-blue-50/30'
                 : 'border-2 border-slate-200 hover:border-blue-300 hover:bg-gradient-to-br hover:from-blue-50/30 hover:to-white'
-            }`}>
+            }`}
+        onClick={handleCardClick}>
 
             {/* Header Section */}
             <div className="relative p-8 pb-6">
@@ -184,7 +200,6 @@ export const PostCard = ({ post }: { post: Post }) => {
                 ? 'bg-red-500/10 opacity-0 group-hover:opacity-100'
                 : 'bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100'
                 }`} />
-            </div>
-        </Link>
+        </div>
     );
 };
