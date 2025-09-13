@@ -1,3 +1,4 @@
+// Updated navbar.tsx
 "use client";
 import {
   Navbar,
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/resizable-navbar";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "../ui/button";
 
 export function NavbarDemo() {
   const navItems = [

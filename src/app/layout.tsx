@@ -1,9 +1,10 @@
+// Updated layout.tsx
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { NavbarDemo } from "@/components/reusable/navbar";
-import { Footer } from "react-day-picker";
 import { Toaster } from "sonner";
+import { Footer } from "@/components/reusable/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,10 +31,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
-        <NavbarDemo />
-        {children}
-        <Footer />
-        <Toaster/>
+        {/* Fixed navbar at top */}
+        <div className="fixed top-0 left-0 right-0 z-50">
+          <NavbarDemo />
+        </div>
+
+        {/* Main content with top padding to account for fixed navbar */}
+        <main className="pt-16"> {/* Adjust pt-16 based on your navbar height */}
+          {children}
+        </main>
+
+        {/* Your actual footer component */}
+        <Footer /> 
+        <Toaster />
       </body>
     </html>
   );
