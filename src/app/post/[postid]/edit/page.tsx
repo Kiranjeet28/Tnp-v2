@@ -1,30 +1,37 @@
-import { notFound } from "next/navigation"
-import { prisma } from "@/lib/prisma"
+"use client"
+import { useParams } from "next/navigation"
 import { PostCreationForm } from "@/components/create/post-creation-form"
+import { usePost } from "@/lib/usePost"
 
-interface PostEditPageProps {
-    params: {
-        postid: string
+export default function PostEditPage() {
+    const { postid } = useParams<{ postid: string }>()
+    const { post, loading, error } = usePost(postid)
+
+    if (loading) {
+        return (
+            <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">
+                <div className="container mx-auto flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-gray-600">Loading post...</p>
+                    </div>
+                </div>
+            </main>
+        )
     }
-}
 
-async function getPost(id: string) {
-    try {
-        const post = await prisma.post.findUnique({
-            where: { id },
-        })
-        return post
-    } catch (error) {
-        console.error("Error fetching post:", error)
-        return null
-    }
-}
-
-export default async function PostEditPage({ params }: PostEditPageProps) {
-    const post = await getPost(params.postid)
-
-    if (!post) {
-        notFound()
+    if (error) {
+        return (
+            <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">
+                <div className="container mx-auto flex items-center justify-center">
+                    <div className="text-center">
+                        <div className="text-red-500 text-xl mb-4">⚠️</div>
+                        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Error</h2>
+                        <p className="text-red-600">{error}</p>
+                    </div>
+                </div>
+            </main>
+        )
     }
 
     return (
