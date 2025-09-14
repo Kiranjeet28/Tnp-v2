@@ -2,6 +2,7 @@ import type React from "react"
 import { Loader2, Star, Search } from "lucide-react"
 import { PostCard } from "./postCard"
 import type { Post } from "@prisma/client"
+import Link from "next/link"
 
 interface PostsListProps {
     posts: Post[]
@@ -53,7 +54,10 @@ const PostsList: React.FC<PostsListProps> = ({ posts, loading, activeOpportuniti
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {posts.map((post: Post) => (
-                            <PostCard key={post.id} post={post} />
+                            <Link key={post.id} href={`/post/${post.id}`} passHref>
+
+                                <PostCard post={post} />
+                            </Link>
                         ))}
                     </div>
                 )}

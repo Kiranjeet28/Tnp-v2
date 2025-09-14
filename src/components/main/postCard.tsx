@@ -33,7 +33,6 @@ export const PostCard = ({ post }: { post: Post }) => {
     const isExpired = post.LastSubmittedAt;
 
     return (
-        <Link href={`/post/${post.id}`} passHref>
             <div className={`group relative bg-white rounded-3xl shadow-md hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-3 ${!isExpired
                 ? 'border border-red-400 hover:border-red-500'
                 : stillOpen
@@ -185,6 +184,6 @@ export const PostCard = ({ post }: { post: Post }) => {
                     : 'bg-gradient-to-r from-blue-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100'
                     }`} />
             </div>
-        </Link>
+      
     );
 };
