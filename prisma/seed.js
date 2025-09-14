@@ -2,274 +2,111 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+// Sample posts rewritten for "Engineering Departments"
 const samplePosts = [
   {
-    title: "New Academic Year 2025-26 Admissions Open",
+    title: "Mechanical Engineering: Robotics Lab Upgrade",
     content: `
-      <h2>Admissions Now Open for Academic Year 2025-26</h2>
-      <p>We are excited to announce that admissions for the academic year 2025-26 are now open across all departments. This year, we are introducing new programs and enhanced facilities to provide students with cutting-edge education.</p>
-      
-      <h3>Key Highlights:</h3>
+      <h2>Robotics Lab Upgrade Announcement</h2>
+      <p>The Mechanical Engineering department has upgraded its robotics lab with new industrial robots and automation kits. Students can now access advanced equipment for hands-on learning and research.</p>
+      <h3>Highlights:</h3>
       <ul>
-        <li>New AI and Machine Learning specialization</li>
-        <li>Updated curriculum aligned with industry standards</li>
-        <li>Enhanced laboratory facilities</li>
-        <li>Increased scholarship opportunities</li>
+        <li>New ABB and KUKA robotic arms</li>
+        <li>PLC and automation training modules</li>
+        <li>Open lab hours for project work</li>
       </ul>
-      
-      <h3>Application Process:</h3>
-      <p>Applications can be submitted online through our portal. Please ensure all required documents are uploaded before the deadline.</p>
-      
-      <p><strong>Important:</strong> Candidates must meet the minimum CGPA requirement to be eligible for admission.</p>
+      <p>Contact the lab coordinator for access and training schedules.</p>
     `,
-    excerpt: "Admissions for 2025-26 are now open with new programs and enhanced facilities. Apply online before the deadline.",
-    tags: ["admissions", "academic", "announcement", "2025-26"],
-    department: "Admissions Office",
-    LastSubmittedAt: new Date('2025-12-31T23:59:59Z'),
-    CGPA: 7.5
-  },
-  {
-    title: "Computer Science Department Workshop on Cloud Computing",
-    content: `
-      <h2>Cloud Computing Workshop - AWS Certification Prep</h2>
-      <p>The Computer Science Department is organizing a comprehensive workshop on Cloud Computing focusing on AWS certification preparation.</p>
-      
-      <h3>Workshop Details:</h3>
-      <ul>
-        <li><strong>Duration:</strong> 5 days intensive program</li>
-        <li><strong>Mode:</strong> Hybrid (Online + Offline)</li>
-        <li><strong>Certification:</strong> AWS Solutions Architect Associate prep</li>
-        <li><strong>Hands-on Labs:</strong> Real-world projects included</li>
-      </ul>
-      
-      <h3>Topics Covered:</h3>
-      <p>EC2, S3, RDS, Lambda, VPC, CloudFormation, Security Best Practices, Cost Optimization, and more.</p>
-      
-      <h3>Prerequisites:</h3>
-      <p>Basic understanding of networking and programming concepts. Students should have completed at least 4 semesters.</p>
-    `,
-    excerpt: "Join our 5-day Cloud Computing workshop focusing on AWS certification preparation with hands-on labs and real-world projects.",
-    tags: ["workshop", "cloud-computing", "aws", "certification", "computer-science"],
-    department: "Computer Science",
-    LastSubmittedAt: new Date('2025-10-15T17:00:00Z'),
-    CGPA: 6.0
-  },
-  {
-    title: "Annual Technical Fest 'TechnoVision 2025' Announcement",
-    content: `
-      <h2>TechnoVision 2025 - Innovate, Create, Celebrate!</h2>
-      <p>Get ready for the most anticipated event of the year! TechnoVision 2025 is here with bigger and better competitions, workshops, and exhibitions.</p>
-      
-      <h3>Event Categories:</h3>
-      <ul>
-        <li><strong>Coding Competitions:</strong> Hackathons, Algorithm contests, App development</li>
-        <li><strong>Robotics:</strong> Line following, Maze solving, Battle bots</li>
-        <li><strong>Electronics:</strong> Circuit designing, Arduino projects</li>
-        <li><strong>Web Development:</strong> Frontend challenges, Full-stack projects</li>
-        <li><strong>AI/ML:</strong> Data science competitions, Neural network challenges</li>
-      </ul>
-      
-      <h3>Special Attractions:</h3>
-      <ul>
-        <li>Guest lectures by industry experts</li>
-        <li>Startup pitch competition with real funding opportunities</li>
-        <li>Tech exhibition showcasing student innovations</li>
-        <li>Cultural nights and entertainment programs</li>
-      </ul>
-      
-      <h3>Prizes Worth:</h3>
-      <p>₹5,00,000+ in cash prizes, internship opportunities, and certificates from leading tech companies.</p>
-    `,
-    excerpt: "TechnoVision 2025 is here! Join us for coding competitions, robotics, AI/ML challenges, and prizes worth ₹5,00,000+",
-    tags: ["tech-fest", "competition", "hackathon", "robotics", "ai-ml", "event"],
-    department: "Student Activities",
-    LastSubmittedAt: new Date('2025-10-30T18:00:00Z'),
-    CGPA: null
-  },
-  {
-    title: "Scholarship Opportunities for Meritorious Students",
-    content: `
-      <h2>Merit-Based Scholarship Program 2025</h2>
-      <p>We are pleased to announce multiple scholarship opportunities for deserving students based on academic excellence and financial need.</p>
-      
-      <h3>Available Scholarships:</h3>
-      <ul>
-        <li><strong>Excellence Scholarship:</strong> 100% tuition fee waiver</li>
-        <li><strong>Merit Scholarship:</strong> 50% tuition fee waiver</li>
-        <li><strong>Need-Based Aid:</strong> Variable amount based on family income</li>
-        <li><strong>Sports Scholarship:</strong> For outstanding athletes</li>
-        <li><strong>Research Scholarship:</strong> For students involved in research projects</li>
-      </ul>
-      
-      <h3>Eligibility Criteria:</h3>
-      <p>Students must maintain the minimum CGPA requirement throughout the scholarship period. Additional criteria may apply for specific scholarships.</p>
-      
-      <h3>Application Process:</h3>
-      <ol>
-        <li>Fill the online application form</li>
-        <li>Submit required documents</li>
-        <li>Attend the interview (if shortlisted)</li>
-        <li>Await final results</li>
-      </ol>
-      
-      <p><em>Don't miss this opportunity to support your educational journey!</em></p>
-    `,
-    excerpt: "Multiple scholarship opportunities available including 100% tuition fee waivers for meritorious students. Apply now!",
-    tags: ["scholarship", "financial-aid", "merit", "education", "opportunity"],
-    department: "Financial Aid Office",
-    LastSubmittedAt: new Date('2025-11-30T23:59:59Z'),
-    CGPA: 8.0
-  },
-  {
-    title: "Industry Internship Drive - Summer 2025",
-    content: `
-      <h2>Summer Internship Opportunities 2025</h2>
-      <p>Leading companies are visiting our campus for summer internship recruitment. This is an excellent opportunity to gain real-world experience and enhance your resume.</p>
-      
-      <h3>Participating Companies:</h3>
-      <ul>
-        <li>Tech Giants: Google, Microsoft, Amazon, Meta</li>
-        <li>Indian IT Leaders: TCS, Infosys, Wipro, HCL</li>
-        <li>Startups: Various funded startups in AI, Fintech, Healthcare</li>
-        <li>Core Companies: L&T, Siemens, ABB, Schneider Electric</li>
-        <li>Consulting: McKinsey, BCG, Deloitte</li>
-      </ul>
-      
-      <h3>Internship Domains:</h3>
-      <ul>
-        <li>Software Development</li>
-        <li>Data Science & Analytics</li>
-        <li>Product Management</li>
-        <li>Digital Marketing</li>
-        <li>Research & Development</li>
-        <li>Business Strategy</li>
-      </ul>
-      
-      <h3>Selection Process:</h3>
-      <p>Companies will conduct online assessments, technical interviews, and HR rounds. Prepare well and make the most of this opportunity!</p>
-    `,
-    excerpt: "Summer 2025 internship drive with top companies including Google, Microsoft, and leading startups. Multiple domains available.",
-    tags: ["internship", "placement", "summer", "industry", "career"],
-    department: "Placement Cell",
-    LastSubmittedAt: new Date('2025-10-20T17:00:00Z'),
+    excerpt: "Mechanical Engineering robotics lab upgraded with new industrial robots and automation kits.",
+    tags: ["mechanical", "robotics", "lab", "automation", "upgrade"],
+    department: "Mechanical Engineering",
+    LastSubmittedAt: new Date('2025-09-15T10:00:00Z'),
     CGPA: 7.0
   },
   {
-    title: "Library Digital Resources and New Book Arrivals",
+    title: "Civil Engineering: Bridge Design Competition",
     content: `
-      <h2>Enhanced Library Services - Digital Resources Update</h2>
-      <p>Our library has significantly expanded its digital resources and received new book shipments across various departments.</p>
-      
-      <h3>New Digital Resources:</h3>
+      <h2>Annual Bridge Design Competition</h2>
+      <p>The Civil Engineering department invites students to participate in the annual bridge design competition. Teams will design and build model bridges judged on strength, efficiency, and innovation.</p>
+      <h3>Details:</h3>
       <ul>
-        <li><strong>IEEE Xplore Digital Library:</strong> Full access to research papers</li>
-        <li><strong>ACM Digital Library:</strong> Computing and IT resources</li>
-        <li><strong>Springer Nature:</strong> Science and engineering journals</li>
-        <li><strong>O'Reilly Learning Platform:</strong> Tech books and courses</li>
-        <li><strong>JSTOR:</strong> Academic journals across disciplines</li>
+        <li>Registration deadline: October 10, 2025</li>
+        <li>Materials provided by department</li>
+        <li>Cash prizes for top 3 teams</li>
       </ul>
-      
-      <h3>Recent Book Acquisitions:</h3>
-      <ul>
-        <li>Latest editions of core Computer Science textbooks</li>
-        <li>Advanced Mathematics and Statistics references</li>
-        <li>Business and Management books</li>
-        <li>Research methodology guides</li>
-        <li>Competitive exam preparation materials</li>
-      </ul>
-      
-      <h3>New Library Timings:</h3>
-      <p><strong>Weekdays:</strong> 8:00 AM - 10:00 PM<br>
-      <strong>Weekends:</strong> 9:00 AM - 6:00 PM</p>
-      
-      <p>Visit the library or access digital resources remotely using your student credentials.</p>
+      <p>Register online or contact your faculty advisor for more information.</p>
     `,
-    excerpt: "Library expands digital resources with IEEE, ACM, Springer access plus new book arrivals. Extended timings now available.",
-    tags: ["library", "digital-resources", "books", "research", "academic"],
-    department: "Library Services",
-    LastSubmittedAt: null,
-    CGPA: null
+    excerpt: "Civil Engineering hosts bridge design competition with prizes for innovative student teams.",
+    tags: ["civil", "competition", "bridge", "design", "event"],
+    department: "Civil Engineering",
+    LastSubmittedAt: new Date('2025-10-10T17:00:00Z'),
+    CGPA: 6.5
   },
   {
-    title: "Mental Health and Wellness Week",
+    title: "Electrical Engineering: IoT Workshop Series",
     content: `
-      <h2>Campus Wellness Week - Prioritizing Mental Health</h2>
-      <p>Join us for a week dedicated to mental health awareness, wellness activities, and creating a supportive campus environment.</p>
-      
-      <h3>Scheduled Activities:</h3>
+      <h2>IoT Workshop Series</h2>
+      <p>The Electrical Engineering department is organizing a series of workshops on Internet of Things (IoT) applications. Topics include sensor integration, wireless communication, and cloud connectivity.</p>
+      <h3>Schedule:</h3>
       <ul>
-        <li><strong>Monday:</strong> Mental Health Awareness Session by professional counselors</li>
-        <li><strong>Tuesday:</strong> Stress Management Workshop</li>
-        <li><strong>Wednesday:</strong> Meditation and Mindfulness Sessions</li>
-        <li><strong>Thursday:</strong> Art Therapy and Creative Expression</li>
-        <li><strong>Friday:</strong> Peer Support Group Meetings</li>
-        <li><strong>Weekend:</strong> Outdoor Activities and Sports</li>
+        <li>Week 1: Sensors and Microcontrollers</li>
+        <li>Week 2: Wireless Protocols</li>
+        <li>Week 3: Cloud Platforms</li>
       </ul>
-      
-      <h3>Resources Available:</h3>
-      <ul>
-        <li>Free counseling sessions</li>
-        <li>24/7 helpline number</li>
-        <li>Peer support network</li>
-        <li>Online mental health resources</li>
-        <li>Wellness mobile app access</li>
-      </ul>
-      
-      <h3>Important Message:</h3>
-      <p><em>Remember, seeking help is a sign of strength, not weakness. Your mental health matters, and we're here to support you every step of the way.</em></p>
+      <p>Open to all engineering students. Register via the department portal.</p>
     `,
-    excerpt: "Campus Wellness Week focuses on mental health with counseling, workshops, meditation, and peer support activities.",
-    tags: ["mental-health", "wellness", "counseling", "support", "awareness"],
-    department: "Student Wellness Center",
-    LastSubmittedAt: null,
-    CGPA: null
+    excerpt: "Electrical Engineering offers IoT workshops covering sensors, wireless, and cloud platforms.",
+    tags: ["electrical", "iot", "workshop", "sensors", "cloud"],
+    department: "Electrical Engineering",
+    LastSubmittedAt: new Date('2025-09-25T15:00:00Z'),
+    CGPA: 7.2
   },
   {
-    title: "Research Grant Funding Opportunity",
+    title: "Computer Engineering: Hackathon 2025",
     content: `
-      <h2>Research Excellence Grant Program 2025</h2>
-      <p>Faculty and postgraduate students are invited to apply for research grants supporting innovative projects across various disciplines.</p>
-      
-      <h3>Grant Categories:</h3>
+      <h2>Hackathon 2025: Code for Change</h2>
+      <p>The Computer Engineering department announces Hackathon 2025, focusing on solutions for smart campuses and sustainability. Teams will develop apps and systems to improve campus life.</p>
+      <h3>Tracks:</h3>
       <ul>
-        <li><strong>Innovation Grant:</strong> Up to ₹10,00,000 for breakthrough research</li>
-        <li><strong>Collaborative Research:</strong> Up to ₹5,00,000 for inter-departmental projects</li>
-        <li><strong>Student Research:</strong> Up to ₹2,00,000 for postgraduate research</li>
-        <li><strong>Equipment Grant:</strong> Up to ₹15,00,000 for research equipment</li>
+        <li>Smart Energy Management</li>
+        <li>Campus Safety</li>
+        <li>Student Services Automation</li>
       </ul>
-      
-      <h3>Focus Areas:</h3>
-      <ul>
-        <li>Artificial Intelligence and Machine Learning</li>
-        <li>Sustainable Technology and Green Energy</li>
-        <li>Biotechnology and Healthcare Innovation</li>
-        <li>Smart Cities and IoT Solutions</li>
-        <li>Data Science and Big Data Analytics</li>
-        <li>Cybersecurity and Blockchain</li>
-      </ul>
-      
-      <h3>Application Requirements:</h3>
-      <p>Detailed research proposal, budget breakdown, expected outcomes, and potential impact assessment must be included.</p>
+      <p>Winners receive internships and cash prizes. Register by September 30.</p>
     `,
-    excerpt: "Research grants up to ₹15,00,000 available for faculty and postgraduate students in AI, sustainability, biotech, and more.",
-    tags: ["research", "grant", "funding", "faculty", "innovation"],
-    department: "Research & Development",
-    LastSubmittedAt: new Date('2025-12-15T17:00:00Z'),
-    CGPA: 8.5
+    excerpt: "Computer Engineering Hackathon 2025 focuses on smart campus and sustainability solutions.",
+    tags: ["computer", "hackathon", "smart-campus", "sustainability", "coding"],
+    department: "Computer Engineering",
+    LastSubmittedAt: new Date('2025-09-30T23:59:59Z'),
+    CGPA: 7.8
+  },
+  {
+    title: "Electronics Engineering: VLSI Design Seminar",
+    content: `
+      <h2>VLSI Design Seminar</h2>
+      <p>The Electronics Engineering department is hosting a seminar on VLSI design trends and industry practices. Guest speakers from leading semiconductor companies will share insights.</p>
+      <h3>Topics:</h3>
+      <ul>
+        <li>Latest VLSI technologies</li>
+        <li>EDA tools and workflows</li>
+        <li>Career opportunities in semiconductor industry</li>
+      </ul>
+      <p>Open to all students. Certificates provided for attendees.</p>
+    `,
+    excerpt: "Electronics Engineering hosts VLSI seminar with industry experts and career guidance.",
+    tags: ["electronics", "vlsi", "seminar", "industry", "career"],
+    department: "Electronics Engineering",
+    LastSubmittedAt: new Date('2025-10-05T14:00:00Z'),
+    CGPA: 7.4
   }
 ];
 
 async function main() {
   try {
     console.log('🌱 Starting database seeding...');
-    
-    // Clear existing posts (optional - remove if you want to keep existing data)
     console.log('🗑️  Clearing existing posts...');
     await prisma.post.deleteMany({});
-    
     console.log('📝 Creating sample posts...');
-    
-    // Create posts one by one to handle any potential errors
     for (const post of samplePosts) {
       try {
         const createdPost = await prisma.post.create({
@@ -280,26 +117,19 @@ async function main() {
         console.error(`❌ Error creating post "${post.title}":`, error.message);
       }
     }
-    
-    // Verify the data
     const totalPosts = await prisma.post.count();
     console.log(`📊 Total posts in database: ${totalPosts}`);
-    
-    // Display some statistics
     const postsByDepartment = await prisma.post.groupBy({
       by: ['department'],
       _count: {
         department: true,
       },
     });
-    
     console.log('📈 Posts by department:');
     postsByDepartment.forEach(dept => {
       console.log(`   ${dept.department || 'No Department'}: ${dept._count.department} posts`);
     });
-    
     console.log('🎉 Database seeding completed successfully!');
-    
   } catch (error) {
     console.error('💥 Error during seeding:', error);
     throw error;
@@ -308,7 +138,6 @@ async function main() {
   }
 }
 
-// Execute the seeding function
 main()
   .catch((error) => {
     console.error('Fatal error:', error);
