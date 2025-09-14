@@ -20,7 +20,7 @@ const samplePosts = [
     excerpt: "Mechanical Engineering robotics lab upgraded with new industrial robots and automation kits.",
     tags: ["mechanical", "robotics", "lab", "automation", "upgrade"],
     department: "Mechanical Engineering",
-    LastSubmittedAt: new Date('2025-09-15T10:00:00Z'),
+    LastSubmittedAt: new Date('2025-03-15T10:00:00Z'),
     CGPA: 7.0
   },
   {
@@ -96,7 +96,7 @@ const samplePosts = [
     excerpt: "Electronics Engineering hosts VLSI seminar with industry experts and career guidance.",
     tags: ["electronics", "vlsi", "seminar", "industry", "career"],
     department: "Electronics Engineering",
-    LastSubmittedAt: new Date('2025-10-05T14:00:00Z'),
+    LastSubmittedAt: new Date('2025-01-05T14:00:00Z'),
     CGPA: 7.4
   }
 ];
