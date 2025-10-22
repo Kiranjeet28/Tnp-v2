@@ -50,7 +50,6 @@ export function PostCreationForm({ initialPost }: PostCreationFormProps) {
             excerpt: "",
             tags: [],
             department: "",
-            CGPA: null,
             LastSubmittedAt: null,
             createdAt: new Date(),
             updatedAt: new Date(),
@@ -111,7 +110,6 @@ export function PostCreationForm({ initialPost }: PostCreationFormProps) {
                 tags: postData.tags,
                 excerpt: postData.excerpt?.trim() || null,
                 department: postData.department ?? null,
-                CGPA: postData.CGPA === null || postData.CGPA === undefined || postData.CGPA === 0 ? null : postData.CGPA,
                 LastSubmittedAt: postData.LastSubmittedAt ? postData.LastSubmittedAt.toISOString() : null,
             }
 
@@ -232,7 +230,6 @@ export function PostCreationForm({ initialPost }: PostCreationFormProps) {
                         </LabelInputContainer>
                     </div>
 
-                    {/* Department and CGPA Row */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
                             <LabelInputContainer>
@@ -257,35 +254,7 @@ export function PostCreationForm({ initialPost }: PostCreationFormProps) {
                             </LabelInputContainer>
                         </div>
 
-                        <div className="space-y-2">
-                            <LabelInputContainer>
-                                <Label
-                                    htmlFor="cgpa"
-                                    className="text-sm font-semibold bg-gradient-to-r from-blue-900 via-blue-700 to-blue-400 bg-clip-text text-transparent"
-                                >
-                                    Minimum CGPA Requirement
-                                </Label>
-                                <Input
-                                    id="cgpa"
-                                    type="number"
-                                    step="0.1"
-                                    min="0"
-                                    max="10"
-                                    placeholder="e.g., 8.5"
-                                    value={
-                                        postData.CGPA !== null && postData.CGPA !== undefined && postData.CGPA !== 0 ? postData.CGPA : ""
-                                    }
-                                    onChange={(e) => {
-                                        const value = e.target.value
-                                        setPostData({
-                                            ...postData,
-                                            CGPA: value === "" ? null : Math.min(10, Math.max(0, Number.parseFloat(value))),
-                                        })
-                                    }}
-                                    className="border-2"
-                                />
-                            </LabelInputContainer>
-                        </div>
+                       
                     </div>
 
                     {/* Deadline */}

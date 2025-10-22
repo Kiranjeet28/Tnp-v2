@@ -10,11 +10,6 @@ const postSchema = z.object({
     excerpt: z.string().optional().nullable(),
     tags: z.array(z.string()).optional().default([]),
     department: z.string().optional().nullable(),
-    CGPA: z
-        .number()
-        .nullable()
-        .optional()
-        .transform((val) => (val === 0 ? null : val)),
     LastSubmittedAt: z
         .string()
         .nullable()
@@ -48,7 +43,6 @@ export async function POST(request: NextRequest) {
                 excerpt: data.excerpt?.trim() || null,
                 tags: data.tags,
                 department: data.department,
-                CGPA: data.CGPA,
                 LastSubmittedAt: data.LastSubmittedAt,
             },
         })
@@ -107,7 +101,6 @@ export async function PUT(request: NextRequest) {
                 excerpt: data.excerpt?.trim() || null,
                 tags: data.tags,
                 department: data.department,
-                CGPA: data.CGPA,
                 LastSubmittedAt: data.LastSubmittedAt,
             },
         })

@@ -4,11 +4,10 @@ export interface PostFilters {
     searchTerm?: string
     department?: string
     tag?: string
-    minCGPA?: number
 }
 
 export async function getPosts(filters: PostFilters = {}) {
-    const { searchTerm, department, tag, minCGPA } = filters
+    const { searchTerm, department, tag} = filters
 
     const where: any = {}
 
@@ -31,13 +30,6 @@ export async function getPosts(filters: PostFilters = {}) {
         where.tags = { has: tag }
     }
 
-    // Filter by CGPA
-    if (minCGPA) {
-        where.OR = [
-            { CGPA: null }, // Posts without CGPA requirement
-            { CGPA: { lte: minCGPA } }, // Posts with CGPA <= user's CGPA
-        ]
-    }
 
     try {
         const posts = await prisma.post.findMany({
@@ -58,7 +50,6 @@ export async function createPost(data: {
     tags: string[]
     department?: string
     LastSubmittedAt?: Date
-    CGPA?: number
 }) {
     try {
         const post = await prisma.post.create({
@@ -92,7 +83,6 @@ export async function updatePost(
         tags: string[]
         department: string
         LastSubmittedAt: Date
-        CGPA: number
     }>,
 ) {
     try {

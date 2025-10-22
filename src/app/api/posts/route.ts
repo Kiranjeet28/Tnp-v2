@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
             searchTerm: searchParams.get("searchTerm") || undefined,
             department: searchParams.get("department") || undefined,
             tag: searchParams.get("tag") || undefined,
-            minCGPA: searchParams.get("minCGPA") ? Number.parseFloat(searchParams.get("minCGPA")!) : undefined,
         }
 
         // Remove undefined values and "All" selections

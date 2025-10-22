@@ -135,19 +135,6 @@ export const PostCard = ({ post }: { post: Post }) => {
                     <div className="grid grid-cols-2 gap-4">
 
 
-                        {/* CGPA */}
-                        {typeof post.CGPA === 'number' && (
-                            <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                                <div className="flex-shrink-0">
-                                    <GraduationCap className="w-5 h-5 text-purple-500" />
-                                </div>
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-xs text-slate-500 font-medium">Min CGPA</p>
-                                    <p className="text-sm font-semibold text-slate-800">{post.CGPA}</p>
-                                </div>
-                            </div>
-                        )}
-
                         {/* Posted Date */}
                         <div className="flex items-center space-x-3 p-3 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                             <div className="flex-shrink-0">

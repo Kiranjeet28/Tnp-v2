@@ -208,18 +208,7 @@ export function PostDetailsView({ post }: PostDetailsViewProps) {
                             </div>
                         )}
 
-                        {/* CGPA */}
-                        {typeof post.CGPA === "number" && (
-                            <div className="flex items-center space-x-4 p-4 rounded-xl bg-slate-50">
-                                <div className="flex-shrink-0">
-                                    <GraduationCap className="w-6 h-6 text-purple-500" />
-                                </div>
-                                <div>
-                                    <p className="text-sm text-slate-500 font-medium">Minimum CGPA</p>
-                                    <p className="text-lg font-semibold text-slate-800">{post.CGPA}</p>
-                                </div>
-                            </div>
-                        )}
+                       
 
                         {/* Posted Date */}
                         <div className="flex items-center space-x-4 p-4 rounded-xl bg-slate-50">

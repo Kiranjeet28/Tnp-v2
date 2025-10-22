@@ -14,7 +14,6 @@ export default function HomePage() {
     const [searchTerm, setSearchTerm] = useState("")
     const [selectedDepartment, setSelectedDepartment] = useState("")
     const [selectedTag, setSelectedTag] = useState("")
-    const [minCGPA, setMinCGPA] = useState("")
     const [showExpiredOnly, setShowExpiredOnly] = useState(false)
 
     // Available filter options
@@ -29,7 +28,6 @@ export default function HomePage() {
             if (searchTerm.trim() !== "") params.append("searchTerm", searchTerm)
             if (selectedDepartment && selectedDepartment !== "") params.append("department", selectedDepartment)
             if (selectedTag && selectedTag !== "") params.append("tag", selectedTag)
-            if (minCGPA.trim() !== "") params.append("minCGPA", minCGPA)
             // Remove the showExpiredOnly from API call since we'll filter client-side
             // if (showExpiredOnly) params.append("showExpiredOnly", "true");
 
@@ -59,7 +57,7 @@ export default function HomePage() {
     // Fetch posts whenever filters change (excluding showExpiredOnly since it's client-side)
     useEffect(() => {
         fetchPosts()
-    }, [searchTerm, selectedDepartment, selectedTag, minCGPA])
+    }, [searchTerm, selectedDepartment, selectedTag])
 
     // Initial load
     useEffect(() => {
@@ -70,7 +68,6 @@ export default function HomePage() {
         setSearchTerm("")
         setSelectedDepartment("")
         setSelectedTag("")
-        setMinCGPA("")
         setShowExpiredOnly(false)
     }
 
@@ -113,8 +110,6 @@ export default function HomePage() {
                     setSelectedDepartment={setSelectedDepartment}
                     selectedTag={selectedTag}
                     setSelectedTag={setSelectedTag}
-                    minCGPA={minCGPA}
-                    setMinCGPA={setMinCGPA}
                     showExpiredOnly={showExpiredOnly}
                     setShowExpiredOnly={setShowExpiredOnly}
                     availableTags={availableTags}

@@ -11,7 +11,6 @@ interface PostData {
     excerpt: string
     tags: string[]
     department: string
-    cgpa: number | null
     lastSubmittedAt: Date | null
 }
 
@@ -50,12 +49,7 @@ export function PostPreview({ postData }: PostPreviewProps) {
                         </div>
                     )}
 
-                    {postData.cgpa && (
-                        <div className="flex items-center gap-1">
-                            <GraduationCap className="h-4 w-4" />
-                            Min CGPA: {postData.cgpa}
-                        </div>
-                    )}
+                  
 
                     {postData.lastSubmittedAt && (
                         <div className="flex items-center gap-1">

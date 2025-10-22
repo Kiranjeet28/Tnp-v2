@@ -15,8 +15,6 @@ interface SmartFilterProps {
     setSelectedDepartment: (value: string) => void
     selectedTag: string
     setSelectedTag: (value: string) => void
-    minCGPA: string | number
-    setMinCGPA: (value: string) => void
     showExpiredOnly: boolean
     setShowExpiredOnly: (value: boolean) => void
     availableDepartments: string[]
@@ -31,8 +29,6 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
     setSelectedDepartment = () => { },
     selectedTag = "",
     setSelectedTag = () => { },
-    minCGPA = "",
-    setMinCGPA = () => { },
     showExpiredOnly = false,
     setShowExpiredOnly = () => { },
     availableDepartments = ["Computer Science", "Engineering", "Business", "Design", "Data Science"],
@@ -54,16 +50,14 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
         if (searchTerm) count++
         if (selectedDepartment) count++
         if (selectedTag) count++
-        if (minCGPA) count++
         if (showExpiredOnly) count++
         setActiveFilters(count)
-    }, [searchTerm, selectedDepartment, selectedTag, minCGPA, showExpiredOnly])
+    }, [searchTerm, selectedDepartment, selectedTag,  showExpiredOnly])
 
     const handleClearFilters = () => {
         setSearchTerm("")
         setSelectedDepartment("")
         setSelectedTag("")
-        setMinCGPA("")
         setShowExpiredOnly(false)
         clearFilters()
     }
@@ -167,51 +161,8 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                             </div>
                         </LabelInputContainer>
 
-                        {/* Job Type Filter */}
-                        <LabelInputContainer>
-                            <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
-                                <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
-                                JOB TYPE
-                            </Label>
-                            <div className="relative group">
-                                <select
-                                    value={selectedTag}
-                                    onChange={(e) => setSelectedTag(e.target.value)}
-                                    className="w-full px-5 py-2 bg-white border-2 border-blue-100 rounded-xl focus:border-blue-600 focus:outline-none transition-all duration-300 text-blue-900 font-medium appearance-none cursor-pointer shadow-md hover:shadow-lg focus:shadow-xl group-hover:border-blue-300 h-10"
-                                >
-                                    <option value="">All Types</option>
-                                    {availableTags.map((tag) => (
-                                        <option key={tag} value={tag}>
-                                            {tag}
-                                        </option>
-                                    ))}
-                                </select>
-                                <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-blue-500 pointer-events-none transition-transform group-hover:scale-110" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-blue-800/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                            </div>
-                        </LabelInputContainer>
-
-                        {/* CGPA Filter */}
-                        <LabelInputContainer>
-                            <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
-                                <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
-                                MIN CGPA
-                            </Label>
-                            <div className="relative group">
-                                <Input
-                                    type="number"
-                                    placeholder="e.g., 7.5"
-                                    step="0.1"
-                                    min="0"
-                                    max="10"
-                                    value={minCGPA}
-                                    onChange={(e) => setMinCGPA(e.target.value)}
-                                    className="w-full px-5 py-4 bg-white border-2 border-blue-100 rounded-xl focus:border-blue-600 focus:outline-none transition-all duration-300 text-blue-900 font-medium shadow-md hover:shadow-lg focus:shadow-xl placeholder-blue-400 group-hover:border-blue-300"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/5 to-blue-800/5 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                            </div>
-                        </LabelInputContainer>
-
+               
+                        
                         {/* Status Toggle */}
                         <LabelInputContainer className="justify-end">
                             <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
@@ -296,13 +247,7 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                                             </div>
                                         </div>
                                     )}
-                                    {minCGPA && (
-                                        <div className="group">
-                                            <div className="px-5 py-3 bg-white text-blue-900 rounded-full font-semibold border-2 border-blue-600 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
-                                                🎯 CGPA ≥ {minCGPA}
-                                            </div>
-                                        </div>
-                                    )}
+                                    
                                     {showExpiredOnly && (
                                         <div className="group">
                                             <div className="px-5 py-3 bg-gradient-to-r from-red-100 to-red-200 text-red-900 rounded-full font-semibold border-2 border-red-400 flex items-center space-x-2 shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-xl">
