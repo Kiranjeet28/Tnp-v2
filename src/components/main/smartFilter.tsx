@@ -164,43 +164,7 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
                
                         
                         {/* Status Toggle */}
-                        <LabelInputContainer className="justify-end">
-                            <Label className="flex items-center text-sm font-bold text-blue-900 tracking-wide">
-                                <div className="w-3 h-3 bg-gradient-to-r from-blue-600 to-blue-800 rounded-full mr-3"></div>
-                                STATUS
-                            </Label>
-                            <div className="relative group">
-                                <button
-                                    onClick={handleExpiredToggle}
-                                    className={`w-full p-4 rounded-xl border-2 transition-all duration-300 text-left font-medium shadow-md hover:shadow-lg ${showExpiredOnly
-                                        ? "bg-gradient-to-r from-red-50 to-red-100 border-red-200 text-red-900"
-                                        : "bg-gradient-to-r from-green-50 to-green-100 border-green-200 text-green-900"
-                                        }`}
-                                >
-                                    <div className="flex items-center justify-between cursor-pointer">
-                                        <div className="flex items-center space-x-3">
-                                            {showExpiredOnly ? (
-                                                <AlertCircle className="w-5 h-5 text-red-600" />
-                                            ) : (
-                                                <Clock className="w-5 h-5 text-green-600" />
-                                            )}
-                                            <span className="font-semibold">
-                                                {showExpiredOnly ? "Expired Only" : "All Jobs"}
-                                            </span>
-                                        </div>
-                                        <div
-                                            className={`relative inline-flex h-6 w-12 items-center rounded-full transition-colors ${showExpiredOnly ? "bg-red-500" : "bg-green-500"
-                                                }`}
-                                        >
-                                            <span
-                                                className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-lg ${showExpiredOnly ? "translate-x-6" : "translate-x-1"
-                                                    }`}
-                                            />
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
-                        </LabelInputContainer>
+                       
                     </div>
 
                     {/* Active Filters Display */}
