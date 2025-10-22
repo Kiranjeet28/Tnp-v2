@@ -1,4 +1,4 @@
-// Updated navbar.tsx
+// Updated navbar.tsx with authentication and role-based access
 "use client";
 import {
   Navbar,
@@ -11,8 +11,16 @@ import {
   MobileNavToggle,
   MobileNavMenu,
 } from "@/components/ui/resizable-navbar";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { User, LogOut, ChevronDown } from "lucide-react";
+
+interface UserData {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+}
 
 export function NavbarDemo() {
   const navItems = [
@@ -31,7 +39,73 @@ export function NavbarDemo() {
   ];
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.user-dropdown')) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    if (isDropdownOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
+  const checkAuth = async () => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/user/login', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+      } else {
+        localStorage.removeItem('authToken');
+      }
+    } catch (err) {
+      console.error('Auth check failed:', err);
+      localStorage.removeItem('authToken');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    setUser(null);
+    setIsDropdownOpen(false);
+    router.push('/');
+  };
+
+  const handleLogin = () => {
+    router.push('/login');
+  };
+
+  const isAdmin = user?.role === 'ADMIN';
 
   return (
     <div className="relative w-full">
@@ -41,12 +115,63 @@ export function NavbarDemo() {
           <NavbarLogo />
           <NavItems items={navItems} />
           <div className="flex items-center gap-4">
-            <NavbarButton
-              onClick={() => router.push('/create')}
-              className="px-8 py-2 rounded-md bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white font-bold transition duration-200 hover:from-gray-200 hover:to-white hover:via-gray-200 hover:text-blue-500 border-2 border-transparent hover:border-blue-500 cursor-pointer"
-            >
-              Create
-            </NavbarButton>
+            {loading ? (
+              <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            ) : user ? (
+              <>
+                {/* Show Create button only for ADMIN */}
+                {isAdmin && (
+                  <NavbarButton
+                    onClick={() => router.push('/create')}
+                    className="px-8 py-2 rounded-md bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white font-bold transition duration-200 hover:from-gray-200 hover:to-white hover:via-gray-200 hover:text-blue-500 border-2 border-transparent hover:border-blue-500 cursor-pointer"
+                  >
+                    Create
+                  </NavbarButton>
+                )}
+
+                {/* User Dropdown */}
+                <div className="relative user-dropdown">
+                  <button
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="font-medium text-gray-700">
+                      {user.name || user.email.split('@')[0]}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                      <div className="px-4 py-3 border-b border-gray-100">
+                        <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
+                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                        <p className="text-xs text-blue-600 font-medium mt-1">{user.role}</p>
+                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 transition-colors flex items-center gap-2"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              // Show Login button when no user
+              <NavbarButton
+                onClick={handleLogin}
+                className="px-8 py-2 rounded-md bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white font-bold transition duration-200 hover:from-gray-200 hover:to-white hover:via-gray-200 hover:text-blue-500 border-2 border-transparent hover:border-blue-500 cursor-pointer"
+              >
+                Login
+              </NavbarButton>
+            )}
           </div>
         </NavBody>
 
@@ -74,13 +199,57 @@ export function NavbarDemo() {
                 <span className="block">{item.name}</span>
               </a>
             ))}
-            <div className="flex w-full flex-col gap-4">
-              <button
-                onClick={() => router.push('/create')}
-                className="px-8 py-2 rounded-md bg-blue-900 text-white font-bold transition duration-200 hover:bg-white hover:text-blue-400 border-2 border-transparent hover:border-blue-500 cursor-pointer"
-              >
-                Create
-              </button>
+
+            <div className="flex w-full flex-col gap-4 mt-4 border-t border-gray-200 pt-4">
+              {loading ? (
+                <div className="flex justify-center py-2">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+              ) : user ? (
+                <>
+                  {/* User Info in Mobile */}
+                  <div className="px-4 py-3 bg-gray-50 rounded-md">
+                    <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
+                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <p className="text-xs text-blue-600 font-medium mt-1">{user.role}</p>
+                  </div>
+
+                  {/* Show Create button only for ADMIN */}
+                  {isAdmin && (
+                    <button
+                      onClick={() => {
+                        router.push('/create');
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className="px-8 py-2 rounded-md bg-blue-900 text-white font-bold transition duration-200 hover:bg-white hover:text-blue-400 border-2 border-transparent hover:border-blue-500 cursor-pointer"
+                    >
+                      Create
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="px-8 py-2 rounded-md bg-red-500 text-white font-bold transition duration-200 hover:bg-red-600 cursor-pointer flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                // Show Login button when no user
+                <button
+                  onClick={() => {
+                    handleLogin();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="px-8 py-2 rounded-md bg-blue-900 text-white font-bold transition duration-200 hover:bg-white hover:text-blue-400 border-2 border-transparent hover:border-blue-500 cursor-pointer"
+                >
+                  Login
+                </button>
+              )}
             </div>
           </MobileNavMenu>
         </MobileNav>

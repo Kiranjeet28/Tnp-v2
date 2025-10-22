@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TNP V2",
-  description: "Training and Placement Portal",
+  title: "Infocascade V2",
+  description: "Infocascade",
 };
 
 export default function RootLayout({
@@ -42,7 +42,7 @@ export default function RootLayout({
         </main>
 
         {/* Your actual footer component */}
-        <Footer /> 
+        <Footer />
         <Toaster />
       </body>
     </html>
