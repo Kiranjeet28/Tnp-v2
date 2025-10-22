@@ -23,21 +23,6 @@ interface UserData {
 }
 
 export function NavbarDemo() {
-  const navItems = [
-    {
-      name: "Home",
-      link: "/",
-    },
-    {
-      name: "Create",
-      link: "/create",
-    },
-    {
-      name: "Contact",
-      link: "https://portfolokiranjeet28.vercel.app/",
-    },
-  ];
-
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<UserData | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -106,6 +91,36 @@ export function NavbarDemo() {
   };
 
   const isAdmin = user?.role === 'ADMIN';
+
+  // Filter navigation items based on user role
+  const getNavItems = () => {
+    const baseNavItems = [
+      {
+        name: "Home",
+        link: "/",
+      },
+      {
+        name: "Contact",
+        link: "https://portfolokiranjeet28.vercel.app/",
+      },
+    ];
+
+    // Only add Create tab if user is ADMIN
+    if (isAdmin) {
+      return [
+        baseNavItems[0], // Home
+        {
+          name: "Create",
+          link: "/create",
+        },
+        baseNavItems[1], // Contact
+      ];
+    }
+
+    return baseNavItems;
+  };
+
+  const navItems = getNavItems();
 
   return (
     <div className="relative w-full">
