@@ -5,6 +5,7 @@ import "./globals.css";
 import { NavbarDemo } from "@/components/reusable/navbar";
 import { Toaster } from "sonner";
 import { Footer } from "@/components/reusable/Footer";
+import { ErrorAlert } from "@/lib/ErrorAlert";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
+        <ErrorAlert />
         {/* Fixed navbar at top */}
         <div className="fixed top-0 left-0 right-0 z-50">
           <NavbarDemo />
