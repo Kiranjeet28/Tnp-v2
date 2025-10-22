@@ -6,7 +6,24 @@ datasource db {
   provider = "mongodb"
   url      = env("DATABASE_URL")
 }
+// User model for authentication
+model User {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  email     String   @unique
+  password  String   // Hashed password
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
+  @@map("users")
+}
+
+// Role enum
+enum Role {
+  ADMIN
+  USER
+}
 // Posts for announcements, news, updates
 model Post {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
