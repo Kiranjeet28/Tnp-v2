@@ -1,8 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { Mail, Lock, User, LogOut, AlertCircle, CheckCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import React, { useState, useEffect } from "react";
+import { Mail, Lock, User, LogOut, AlertCircle, CheckCircle } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/context/AuthContext"; // ✅ Import Auth Context
 
 interface User {
   id: string;
@@ -20,120 +22,93 @@ interface AuthResponse {
 }
 
 export default function AuthApp() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [user, setUser] = useState<User | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
+  const router = useRouter();
+  const { user, login, logout, checkAuth, isAuthenticated } = useAuth(); // ✅ Use context
+
+  // Check if user already logged in
   useEffect(() => {
-    checkAuth();
+    checkAuth().finally(() => setIsCheckingAuth(false));
   }, []);
-
-  const checkAuth = async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      setIsCheckingAuth(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/user/login', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        localStorage.removeItem('authToken');
-      }
-    } catch (err) {
-      console.error('Auth check failed:', err);
-      localStorage.removeItem('authToken');
-    } finally {
-      setIsCheckingAuth(false);
-    }
-  };
 
   const handleSubmit = async () => {
     if (!email || !password) {
-      setError('Email and password are required');
+      setError("Email and password are required");
       return;
     }
 
     setLoading(true);
-    setError('');
-    setSuccess('');
+    setError("");
+    setSuccess("");
 
     try {
-      const response = await fetch('/api/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password, name: name || undefined })
+      const response = await fetch("/api/user/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name: name || undefined }),
       });
 
       const data: AuthResponse = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Authentication failed');
+        setError(data.error || "Authentication failed");
         return;
       }
 
-      localStorage.setItem('authToken', data.token);
-      setUser(data.user);
+      // ✅ Use AuthContext login (this sets user + token globally)
+      login(data.token, data.user);
+
       setSuccess(data.message);
-      setEmail('');
-      setPassword('');
-      setName('');
+      setEmail("");
+      setPassword("");
+      setName("");
+
+      // ✅ Redirect only after login is set in context
+      router.push("/");
     } catch (err) {
-      setError('Network error. Please try again.');
-      console.error('Auth error:', err);
+      console.error("Auth error:", err);
+      setError("Network error. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
-    setSuccess('Logged out successfully');
+    logout(); // ✅ Calls context logout (clears token + user globally)
+    setSuccess("Logged out successfully");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !loading) {
-      handleSubmit();
-    }
+    if (e.key === "Enter" && !loading) handleSubmit();
   };
 
   if (isCheckingAuth) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin h-12 w-12 border-b-2 border-indigo-600 rounded-full"></div>
       </div>
     );
   }
 
-  if (user) {
+  // ✅ If user logged in (from context)
+  if (isAuthenticated && user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-50 to-indigo-100">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
           <div className="text-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center">
               <User className="w-10 h-10 text-white" />
-                    </div>
-                    <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent">
-                        Welcome Back!
-                    </h1>
-                   
-            
+            </div>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-900 via-blue-700 to-blue-900 bg-clip-text text-transparent">
+              Welcome Back!
+            </h1>
             <p className="text-gray-600 mt-2">You're successfully logged in</p>
           </div>
 
@@ -172,6 +147,8 @@ export default function AuthApp() {
       </div>
     );
   }
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">

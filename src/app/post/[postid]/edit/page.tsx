@@ -1,12 +1,16 @@
 "use client"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import { PostCreationForm } from "@/components/create/post-creation-form"
 import { usePost } from "@/lib/usePost"
-
+import { useAuth } from "@/components/context/AuthContext";
 export default function PostEditPage() {
     const { postid } = useParams<{ postid: string }>()
     const { post, loading, error } = usePost(postid)
-
+    const { isAdmin, isAuthenticated } = useAuth();
+    if (!isAdmin || !isAuthenticated) {
+        const route = useRouter();
+        route.push("/");
+    }
     if (loading) {
         return (
             <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">

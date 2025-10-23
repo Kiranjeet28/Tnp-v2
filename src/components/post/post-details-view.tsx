@@ -19,6 +19,7 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { useAuth } from "../context/AuthContext"
 
 interface PostDetailsViewProps {
     post: Post
@@ -27,6 +28,7 @@ interface PostDetailsViewProps {
 export function PostDetailsView({ post }: PostDetailsViewProps) {
     const router = useRouter()
     const [isDeleting, setIsDeleting] = useState(false)
+    const { user, isAdmin, logout } = useAuth();
 
     const isPostNotDue = (post: Post) => {
         if (!post.LastSubmittedAt) return false
@@ -95,11 +97,14 @@ export function PostDetailsView({ post }: PostDetailsViewProps) {
                 </Button>
 
                 <div className="flex items-center gap-3">
-                    <Button onClick={handleEdit} className="flex items-center gap-2  bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white font-bold transition duration-200 hover:from-gray-200 hover:to-white hover:via-gray-200 hover:text-blue-500 border-2 border-transparent hover:border-blue-500 cursor-pointer">
-                        <Edit className="w-4 h-4 cursor-pointer" />
-                        Edit Post
-                    </Button>
-
+                    {isAdmin && ( 
+                        <Button onClick={handleEdit} className="flex items-center gap-2  bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white font-bold transition duration-200 hover:from-gray-200 hover:to-white hover:via-gray-200 hover:text-blue-500 border-2 border-transparent hover:border-blue-500 cursor-pointer">
+                            <Edit className="w-4 h-4 cursor-pointer" />
+                            Edit Post
+                        </Button>
+                    )}
+                    
+                    {isAdmin && ( 
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button
@@ -129,6 +134,8 @@ export function PostDetailsView({ post }: PostDetailsViewProps) {
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
+                    )}
+
                 </div>
             </div>
 

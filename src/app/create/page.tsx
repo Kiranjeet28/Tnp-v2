@@ -1,6 +1,14 @@
+"use client"
+import { useAuth } from "@/components/context/AuthContext"
 import { PostCreationForm } from "@/components/create/post-creation-form"
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+    const { isAdmin, isAuthenticated } = useAuth();
+    if (!isAdmin || !isAuthenticated) {
+        const route = useRouter();
+        route.push("/");
+    }
     return (
         <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 py-12 px-4">
             <div className="container mx-auto">

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react"
 import PostsList from "./postList"
 import { Statistics } from "./Analysis"
 import SmartFilter from "./smartFilter"
+import { useAuth } from "../context/AuthContext"
 
 export default function HomePage() {
     const [posts, setPosts] = useState<Post[]>([])
@@ -97,11 +98,14 @@ export default function HomePage() {
     const expiredOpportunities = posts.filter((post) => {
         return !post.LastSubmittedAt || new Date(post.LastSubmittedAt) < now
     }).length
-
+ const { user, isAdmin, logout } = useAuth();
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+            {isAdmin && 
+            (
             <Statistics activeOpportunities={activeOpportunities} expiredOpportunities={expiredOpportunities} />
-
+            )
+            }
             <div className="container mx-auto px-4 py-12">
                 <SmartFilter
                     searchTerm={searchTerm}

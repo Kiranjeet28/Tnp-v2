@@ -1,4 +1,4 @@
-// Updated navbar.tsx with authentication and role-based access
+// Updated navbar.tsx using Auth Context
 "use client";
 import {
   Navbar,
@@ -14,24 +14,15 @@ import {
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { User, LogOut, ChevronDown } from "lucide-react";
-
-interface UserData {
-  id: string;
-  email: string;
-  name: string | null;
-  role: string;
-}
+import { useAuth } from "@/components/context/AuthContext";
 
 export function NavbarDemo() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [user, setUser] = useState<UserData | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  // Use auth context instead of local state
+  const { user, loading, logout, isAdmin, isAuthenticated } = useAuth();
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -51,46 +42,14 @@ export function NavbarDemo() {
     };
   }, [isDropdownOpen]);
 
-  const checkAuth = async () => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/user/login', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        localStorage.removeItem('authToken');
-      }
-    } catch (err) {
-      console.error('Auth check failed:', err);
-      localStorage.removeItem('authToken');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    setUser(null);
+    logout();
     setIsDropdownOpen(false);
-    router.push('/');
   };
 
   const handleLogin = () => {
     router.push('/login');
   };
-
-  const isAdmin = user?.role === 'ADMIN';
 
   // Filter navigation items based on user role
   const getNavItems = () => {
@@ -132,7 +91,7 @@ export function NavbarDemo() {
           <div className="flex items-center gap-4">
             {loading ? (
               <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-            ) : user ? (
+            ) : isAuthenticated ? (
               <>
                 {/* Show Create button only for ADMIN */}
                 {isAdmin && (
@@ -148,24 +107,21 @@ export function NavbarDemo() {
                 <div className="relative user-dropdown">
                   <button
                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    className="flex items-center gap-2 px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-md transition-colors"
                   >
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
                       <User className="w-4 h-4 text-white" />
                     </div>
-                    <span className="font-medium text-gray-700">
-                      {user.name || user.email.split('@')[0]}
-                    </span>
-                    <ChevronDown className={`w-4 h-4 text-gray-600 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                   
                   </button>
 
                   {/* Dropdown Menu */}
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                       <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
-                        <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                        <p className="text-xs text-blue-600 font-medium mt-1">{user.role}</p>
+                        <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
+                        <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                        <p className="text-xs text-blue-600 font-medium mt-1">{user?.role}</p>
                       </div>
                       <button
                         onClick={handleLogout}
@@ -220,13 +176,13 @@ export function NavbarDemo() {
                 <div className="flex justify-center py-2">
                   <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
                 </div>
-              ) : user ? (
+              ) : isAuthenticated ? (
                 <>
                   {/* User Info in Mobile */}
                   <div className="px-4 py-3 bg-gray-50 rounded-md">
-                    <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
-                    <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                    <p className="text-xs text-blue-600 font-medium mt-1">{user.role}</p>
+                    <p className="text-sm font-medium text-gray-900">{user?.name || 'User'}</p>
+                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                    <p className="text-xs text-blue-600 font-medium mt-1">{user?.role}</p>
                   </div>
 
                   {/* Show Create button only for ADMIN */}

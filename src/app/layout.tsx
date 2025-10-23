@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import { Footer } from "@/components/reusable/Footer";
 import { ErrorAlert } from "@/lib/ErrorAlert";
 import { Suspense } from "react";
+import { AuthProvider } from "@/components/context/AuthContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-x-hidden`}
       >
-        <Suspense fallback={<div>Loading...</div>}>
+        <AuthProvider>        <Suspense fallback={<div>Loading...</div>}>
           <ErrorAlert />
         </Suspense>
         {/* Fixed navbar at top */}
@@ -48,7 +49,9 @@ export default function RootLayout({
 
         {/* Your actual footer component */}
         <Footer />
-        <Toaster />
+          <Toaster />
+        </AuthProvider>
+
       </body>
     </html>
   );
