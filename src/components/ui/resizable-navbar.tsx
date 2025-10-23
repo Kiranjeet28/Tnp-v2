@@ -251,7 +251,7 @@ export const NavbarLogo = () => {
       )}
     >
       <img
-        src="/logo.jpeg"
+        src="/logo.png"
         alt="logo"
         width={30}
         height={30}
