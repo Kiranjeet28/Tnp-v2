@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 
 const prisma = new PrismaClient();
 
@@ -21,7 +22,6 @@ const samplePosts = [
     tags: ["mechanical", "robotics", "lab", "automation", "upgrade"],
     department: "Mechanical Engineering",
     LastSubmittedAt: new Date('2025-03-15T10:00:00Z'),
-    CGPA: 7.0
   },
   {
     title: "Civil Engineering: Bridge Design Competition",
@@ -39,8 +39,7 @@ const samplePosts = [
     excerpt: "Civil Engineering hosts bridge design competition with prizes for innovative student teams.",
     tags: ["civil", "competition", "bridge", "design", "event"],
     department: "Civil Engineering",
-    LastSubmittedAt: new Date('2025-10-10T17:00:00Z'),
-    CGPA: 6.5
+    LastSubmittedAt: new Date('2025-11-10T17:00:00Z'),
   },
   {
     title: "Electrical Engineering: IoT Workshop Series",
@@ -58,8 +57,7 @@ const samplePosts = [
     excerpt: "Electrical Engineering offers IoT workshops covering sensors, wireless, and cloud platforms.",
     tags: ["electrical", "iot", "workshop", "sensors", "cloud"],
     department: "Electrical Engineering",
-    LastSubmittedAt: new Date('2025-09-25T15:00:00Z'),
-    CGPA: 7.2
+    LastSubmittedAt: new Date('2025-12-25T15:00:00Z'),
   },
   {
     title: "Computer Engineering: Hackathon 2025",
@@ -77,8 +75,7 @@ const samplePosts = [
     excerpt: "Computer Engineering Hackathon 2025 focuses on smart campus and sustainability solutions.",
     tags: ["computer", "hackathon", "smart-campus", "sustainability", "coding"],
     department: "Computer Engineering",
-    LastSubmittedAt: new Date('2025-09-30T23:59:59Z'),
-    CGPA: 7.8
+    LastSubmittedAt: new Date('2025-12-30T23:59:59Z'),
   },
   {
     title: "Electronics Engineering: VLSI Design Seminar",
@@ -96,16 +93,33 @@ const samplePosts = [
     excerpt: "Electronics Engineering hosts VLSI seminar with industry experts and career guidance.",
     tags: ["electronics", "vlsi", "seminar", "industry", "career"],
     department: "Electronics Engineering",
-    LastSubmittedAt: new Date('2025-01-05T14:00:00Z'),
-    CGPA: 7.4
+    LastSubmittedAt: new Date('2026-01-05T14:00:00Z'),
   }
 ];
 
 async function main() {
   try {
     console.log('🌱 Starting database seeding...');
-    console.log('🗑️  Clearing existing posts...');
+    
+    // Clear existing data
+    console.log('🗑️  Clearing existing data...');
     await prisma.post.deleteMany({});
+    await prisma.user.deleteMany({});
+    
+    // Create admin user
+    console.log('👤 Creating admin user...');
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const admin = await prisma.user.create({
+      data: {
+        email: 'admin@engineering.edu',
+        password: hashedPassword,
+        name: 'Admin User',
+        role: 'ADMIN',
+      },
+    });
+    console.log(`✅ Created admin user: ${admin.email}`);
+    
+    // Create sample posts
     console.log('📝 Creating sample posts...');
     for (const post of samplePosts) {
       try {
@@ -117,19 +131,33 @@ async function main() {
         console.error(`❌ Error creating post "${post.title}":`, error.message);
       }
     }
+    
+    // Display statistics
+    const totalUsers = await prisma.user.count();
     const totalPosts = await prisma.post.count();
-    console.log(`📊 Total posts in database: ${totalPosts}`);
+    
+    console.log('\n📊 Database Statistics:');
+    console.log(`   Users: ${totalUsers}`);
+    console.log(`   Posts: ${totalPosts}`);
+    
     const postsByDepartment = await prisma.post.groupBy({
       by: ['department'],
       _count: {
         department: true,
       },
     });
-    console.log('📈 Posts by department:');
+    
+    console.log('\n📈 Posts by department:');
     postsByDepartment.forEach(dept => {
       console.log(`   ${dept.department || 'No Department'}: ${dept._count.department} posts`);
     });
-    console.log('🎉 Database seeding completed successfully!');
+    
+    console.log('\n🔐 Admin Credentials:');
+    console.log(`   Email: ${admin.email}`);
+    console.log(`   Password: admin123`);
+    console.log(`   Role: ${admin.role}`);
+    
+    console.log('\n🎉 Database seeding completed successfully!');
   } catch (error) {
     console.error('💥 Error during seeding:', error);
     throw error;
