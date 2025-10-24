@@ -64,17 +64,7 @@ export function NavbarDemo() {
       },
     ];
 
-    // Only add Create tab if user is ADMIN
-    if (isAdmin) {
-      return [
-        baseNavItems[0], // Home
-        {
-          name: "Create",
-          link: "/create",
-        },
-        baseNavItems[1], // Contact
-      ];
-    }
+  
 
     return baseNavItems;
   };

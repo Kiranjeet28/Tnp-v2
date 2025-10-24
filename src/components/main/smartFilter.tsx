@@ -31,7 +31,7 @@ const SmartFilter: React.FC<SmartFilterProps> = ({
     setSelectedTag = () => { },
     showExpiredOnly = false,
     setShowExpiredOnly = () => { },
-    availableDepartments = ["Computer Science", "Engineering", "Business", "Design", "Data Science"],
+    availableDepartments = ["All Departments", "Computer Science", "Engineering", "Business", "Design", "Data Science"],
     availableTags = ["Remote", "Full-time", "Internship", "Contract", "Part-time"],
     clearFilters = () => { },
 }) => {

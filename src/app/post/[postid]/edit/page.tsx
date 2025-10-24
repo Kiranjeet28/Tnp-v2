@@ -7,6 +7,7 @@ export default function PostEditPage() {
     const { postid } = useParams<{ postid: string }>()
     const { post, loading, error } = usePost(postid)
     const { isAdmin, isAuthenticated } = useAuth();
+    console.log(isAdmin, isAuthenticated);
     if (!isAdmin || !isAuthenticated) {
         const route = useRouter();
         route.push("/");

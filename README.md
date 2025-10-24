@@ -27,6 +27,7 @@ The development server will run at `http://localhost:3000`
     2. Delete Post 
     3. Edit Post 
     4. Preview Post 
+    5. View all Post (Expired also)
 # For User 
     1. View Post 
     2. Search Post 

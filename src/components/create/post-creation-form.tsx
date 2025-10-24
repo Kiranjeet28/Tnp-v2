@@ -147,6 +147,7 @@ export function PostCreationForm({ initialPost }: PostCreationFormProps) {
     }
 
     const departments = [
+        "All Departments",
         "Computer Science",
         "Electrical Engineering",
         "Mechanical Engineering",
